@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack - Virtual Gym Companion</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>FitTrack</h1>
+            <p>Your Personal Gym Progress Tracker</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="showSection('workout')">Log Workout</button>
+            <button class="nav-btn" onclick="showSection('history')">History</button>
+            <button class="nav-btn" onclick="showSection('progress')">Progress</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <h2>Dashboard</h2>
+                <button class="toggle-instructions" onclick="toggleInstructions('dashboard-instructions')">Show Instructions</button>
+                <div id="dashboard-instructions" class="instructions" style="display: none;">
+                    <h3>Welcome to FitTrack!</h3>
+                    <p>Track your gym progress with ease:</p>
+                    <ul>
+                        <li><strong>Dashboard</strong>: View your workout stats at a glance.</li>
+                        <li><strong>Log Workout</strong>: Enter workout details manually or upload a JSON file.</li>
+                        <li><strong>History</strong>: Review all your past workouts.</li>
+                        <li><strong>Progress</strong>: See your progress over time (charts coming soon).</li>
+                        <li><strong>Quick Log</strong>: Use the "+" button to log a workout with a single click.</li>
+                    </ul>
+                    <p>Click the navigation buttons above to get started!</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="totalWorkouts">0</h3>
+                        <p>Total Workouts</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="thisWeekWorkouts">0</h3>
+                        <p>This Week</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="totalExercises">0</h3>
+                        <p>Total Exercises</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="avgWorkoutTime">0</h3>
+                        <p>Avg Duration (min)</p>
+                    </div>
+                    <div class="stat-card">
+                        <button class="reset-btn" onclick="resetAllData()">Reset All Data</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        Weekly Workout Frequency
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Form Section -->
+            <div id="workout" class="section">
+                <h2>Log Your Workout</h2>
+                <div class="workout-form">
+                    <form id="workoutForm">
+                        <h3>Workout Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="workoutName">Workout Name</label>
+                                <input type="text" id="workoutName" name="workoutName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="workoutDate">Date</label>
+                                <input type="datetime-local" id="workoutDate" name="workoutDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="duration">Duration (minutes)</label>
+                                <input type="number" id="duration" name="duration" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="workoutType">Workout Type</label>
+                                <select id="workoutType" name="workoutType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="strength">Strength Training</option>
+                                    <option value="cardio">Cardio</option>
+                                    <option value="flexibility">Flexibility</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="How did you feel? Any achievements?"></textarea>
+                        </div>
+
+                        <h3>Exercises</h3>
+                        <div id="exerciseContainer">
+                            <div class="exercise-entry">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Exercise Name</label>
+                                        <input type="text" name="exerciseName" placeholder="e.g., Bench Press" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sets</label>
+                                        <input type="number" name="sets" min="1" placeholder="3" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reps</label>
+                                        <input type="number" name="reps" min="1" placeholder="10" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Weight (kg)</label>
+                                        <input type="number" name="weight" min="0" step="0.5" placeholder="50">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addExercise()" class="add-exercise-btn">Add Exercise</button>
+                        <button type="submit" class="submit-btn">Save Workout</button>
+                    </form>
+
+                    <!-- File Upload Section -->
+                    <h3>Upload Workout</h3>
+                    <button class="toggle-instructions" onclick="toggleInstructions('workout-instructions')">Show Upload Instructions</button>
+                    <div id="workout-instructions" class="instructions" style="display: none;">
+                        <h4>How to Upload a Workout</h4>
+                        <p>Upload a JSON file with your workout data using the format below:</p>
+                        <pre>
+{
+  "name": "Workout Name",
+  "date": "YYYY-MM-DDTHH:MM",
+  "duration": 60,
+  "type": "strength|cardio|flexibility|sports|other",
+  "notes": "Optional notes",
+  "exercises": [
+    {
+      "name": "Exercise Name",
+      "sets": 3,
+      "reps": 10,
+      "weight": 50
+    }
+  ]
+}
+                        </pre>
+                        <p>Click "Upload Workout" to add it to your history.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="workoutFile">Upload Workout (JSON)</label>
+                        <input type="file" id="workoutFile" name="workoutFile" accept=".json">
+                        <button type="button" onclick="uploadWorkoutFile()" class="submit-btn">Upload Workout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div id="history" class="section">
+                <h2>Workout History</h2>
+                <div class="workout-history" id="workoutHistory">
+                    <!-- Workout history will be populated here -->
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progress" class="section">
+                <h2>Progress Tracking</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        Progress charts will be displayed here
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Log Button -->
+        <button class="quick-log" onclick="quickLogWorkout()">+</button>
+
+        <!-- Loading overlay -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
